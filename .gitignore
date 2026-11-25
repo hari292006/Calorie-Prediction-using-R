@@ -1,0 +1,7 @@
+.Rlibs/
+.Rhistory
+.RData
+.Rproj.user/
+Rplots.pdf
+*.Rout
+

@@ -1,0 +1,84 @@
+================================================================================
+       CALORIE BURN PREDICTOR - MACHINE LEARNING EVALUATION REPORT             
+================================================================================
+Generated On: 2026-11-11 22:31:44
+Environment : R version4.6.1(x86_64-pc-linux-gnu)
+
+1. DATASET SPECIFICATIONS
+--------------------------------------------------------------------------------
+Total Observations     : 15000
+Features Analyzed      : Gender, Age, Height, Weight, Duration, Heart_Rate, Body_Temp, BMI
+Target Variable        : Calories (Continuous kcal)
+Data Leakage Prevention: User_ID uniquely identifies participants and was strictly
+                         excluded from feature matrices and correlation computations.
+                         Preprocessing parameters are fitted solely on training data.
+
+2. ALGORITHM SELECTION RATIONALE
+--------------------------------------------------------------------------------
+Three distinct regression paradigms were selected to evaluate physical energy expenditure:
+  • Multiple Linear Regression (OLS):
+    Serves as the interpretable parametric baseline. Assumes linear relationship between
+    physiological predictors and caloric expenditure.
+  • Decision Tree Regression (rpart):
+    Non-parametric recursive binary partitioning model. Captures basic threshold-based
+    interactions without linearity assumptions.
+  • Random Forest Regression (randomForest, 80 trees):
+    Bootstrap aggregation (bagging) ensemble. Averages 80 decorrelated decision trees,
+    modeling complex non-linear metabolic interactions while resisting overfitting.
+
+3. FIVE-FOLD CROSS-VALIDATION RESULTS (Training Partition: 12,000 Obs)
+--------------------------------------------------------------------------------
+Folds were identically partitioned across all candidate models to ensure strict pairing.
+Model Architecture   | CV MAE (Mean±SD) | CV RMSE (Mean±SD) | CV R² (Mean±SD)
+-----------------------------------------------------------------------------
+Random Forest        |  3.049 ± 0.175   |  4.862 ± 0.345   | 0.9939 ± 0.0008 
+Linear Regression    |  8.158 ± 0.090   | 11.091 ± 0.169   | 0.9684 ± 0.0007 
+Decision Tree        |  9.764 ± 0.138   | 13.085 ± 0.281   | 0.9560 ± 0.0018 
+
+Model Selection Decision: Random Forest was chosen as the optimal operational model
+based on achieving the lowest cross-validation RMSE and highest cross-validation R².
+
+4. FINAL TEST SET PERFORMANCE (Untouched 3,000 Obs)
+--------------------------------------------------------------------------------
+Held-out test partition evaluated once to verify genuine out-of-sample generalization.
+Model Architecture   | Test MAE     | Test RMSE    | Test R²  
+--------------------------------------------------------------
+Random Forest        |      2.773 kcal |      4.479 kcal |     0.9949
+Linear Regression    |      7.908 kcal |     10.816 kcal |     0.9703
+Decision Tree        |      9.489 kcal |     12.849 kcal |     0.9580
+
+5. RESIDUAL DIAGNOSTICS & ERROR BEHAVIOR
+--------------------------------------------------------------------------------
+Model                | Mean Error | SD Error   | Skewness | Outliers (>3σ)
+--------------------------------------------------------------------------
+Linear Regression    |     0.0408 |     10.817 |    1.133 |   55 (1.83%)
+Decision Tree        |     0.3945 |     12.845 |    0.463 |   32 (1.07%)
+Random Forest        |     0.2252 |      4.475 |    2.107 |   56 (1.87%)
+
+6. PHYSIOLOGICAL TARGET CORRELATIONS & HIGH R² ANALYSIS
+--------------------------------------------------------------------------------
+Top feature correlations with Calorie burn (User_ID excluded):
+  • Duration   : r = +0.9554 (Cumulative mechanical workout volume)
+  • Heart Rate : r = +0.8979 (Cardiovascular intensity & metabolic strain)
+  • Body Temp  : r = +0.8246 (Thermogenic metabolic heat production)
+  • Age        : r = +0.1544
+  • BMI        : r = +0.0565
+  • Weight     : r = +0.0355
+  • Height     : r = +0.0175
+
+High R² Discussion: Energy expenditure in exercise physiology is fundamentally governed
+by the laws of thermodynamics: Total Work = Intensity × Duration. Duration and Heart Rate
+serve as direct proxies for volume and intensity, accounting for the strong predictive fit.
+This high explanatory power represents physical law, not target leakage.
+
+7. ASSUMPTIONS, LIMITATIONS & ETHICAL NOTICE
+--------------------------------------------------------------------------------
+  1. Observational Scope: Dataset reflects structured indoor exercise recordings.
+     Extrapolation to extreme endurance sports (>300 min) or elite athletes may vary.
+  2. Uncertainty Intervals: Classical OLS prediction intervals strictly apply to Linear
+     Regression under homoscedastic Gaussian error assumptions. They are not transferable
+     to Random Forest non-linear ensembles.
+  3. Non-Medical Disclaimer: Calorie burn predictions and BMI calculations are statistical
+     machine-learning estimates. They are not intended for clinical diagnosis, medical
+     treatment, or individualized metabolic prescription.
+================================================================================
